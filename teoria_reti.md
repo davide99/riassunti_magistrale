@@ -26,3 +26,20 @@ Algoritmo:
     * porta migliore per raggiungere root
 1. Trovo **blocked ports** =
     * porte che non sono nè *root* nè *designated*
+
+## Switch multilayer
+### Tipi di interfacce disponibili
+1. **Interfacce L2**
+    * Classica switch
+    * Access/Trunk
+1. **Interfacce L3**
+    * Classica router (se modalità access)
+    * In trunk mode riceve traffico taggato da
+    più VLAN
+        * Dovranno essere create più
+        sottointerfacce L3
+        * Alternativa 1 per one-arm
+1. **Interfaccia virtuale VLAN L3**
+    * Creata con `interface vlan ...`
+    * Gli viene assegnato indirizzo IP
+    * Alternativa 2 per one-arm
