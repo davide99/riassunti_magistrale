@@ -43,3 +43,12 @@ Algoritmo:
     * Creata con `interface vlan ...`
     * Gli viene assegnato indirizzo IP
     * Alternativa 2 per one-arm
+
+## One-arm router
+1. Configurare arm come trunk
+1. Due alternative:
+    1. Creo sottointerfacce L3
+    1. Creo interfacce virtuali VLAN L3
+        * In questo caso il traffico viene
+        inoltrato alla VLAN giusta in base al id
+        del frame 802.1Q
