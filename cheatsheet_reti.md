@@ -6,6 +6,11 @@
 ip addr add 192.168.0.1/24 dev eth0
 ```
 
+### Configurazione route
+```bash
+ip route add 0.0.0.0/0 via <default gateway IP>
+```
+
 ### ARP
 #### Mostrare cache ARP
 ```bash
@@ -45,6 +50,34 @@ R1(config-if)#shut
 #### Mostra informazioni su interfacce
 ```
 R1#show int
+```
+
+#### Impostazione indirizzo interfaccia
+```
+R1(config-if)#ip address 192.168.1.1 255.255.255.0
+```
+
+#### Velocità e duplex interfaccia
+```
+R1(config-if)#speed 100
+R1(config-if)#duplex full
+```
+Utile per interfaccia one-arm di un router.
+
+#### Configurazione sottointerfaccia
+Creo sottointerfaccia per VLAN 2:
+```
+R1(config)#int fa0/0
+R1(config)#no shut
+R1(config-if)#int fa0/0.2
+R1(config-subif)#encapsulation dot1q 2
+R1(config-subif)#no shut
+```
+Utile per interfaccia one-arm di un router.
+
+#### Rimozione sottointerfaccia
+```
+R1(config-if)#no int fa0/0.2
 ```
 
 ## Configurazione switch
@@ -87,10 +120,25 @@ SW1(vlan)#vlan 2
 SW1(config)#spanning-tree vlan 2
 ```
 
+#### Porta access
+```
+SW1(config-if)#switchport access vlan 2
+```
+
 #### Porta trunk
 ```
 SW1(config-if)#switchport mode trunk
 ```
+
+#### Configurazione one-arm con switch multilayer
+1. Creare nel database le VLAN
+1. Configurare l'interfaccia one-arm come trunk
+1. Creare delle *interfacce LVAN* e assegnare gli IP dei DG:
+    ```
+    SW1(config)#int vlan 2
+    SW1(config-if)#ip address 192.168.1.254 255.255.255.0
+    SW1(config-if)#no shut
+    ```
 
 
 ### Filtering database
