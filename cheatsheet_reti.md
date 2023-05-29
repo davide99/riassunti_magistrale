@@ -11,6 +11,12 @@ ip addr add 192.168.0.1/24 dev eth0
 ip route add 0.0.0.0/0 via <default gateway IP>
 ```
 
+### DHCP
+Funziona solo su VPCS:
+```
+dhcp
+```
+
 ### ARP
 #### Mostrare cache ARP
 ```bash
@@ -41,6 +47,23 @@ iperf3 -c <IP server>
 1. *Interface configuration*: `R1(config-if)#`
     * Ci si entra con: `int fa0/1`
 
+## Ping su router
+```
+R1#ping <ip>
+```
+
+### Route
+#### Mostrare route
+```
+R1#show ip route
+```
+
+#### Aggiungere route statica
+```
+R1(config)#ip route 8.8.8.0 255.255.255.0 192.168.5.2
+```
+Dove l'ultimo IP è quello del next hop (router).
+
 ### Interfacce
 #### Disabilitazione interfaccia
 ```
@@ -52,9 +75,45 @@ R1(config-if)#shut
 R1#show int
 ```
 
-#### Impostazione indirizzo interfaccia
+#### Impostazione indirizzo interfaccia statico
 ```
 R1(config-if)#ip address 192.168.1.1 255.255.255.0
+```
+
+#### Impostazione indirizzo interfaccia con DHCP
+```
+R1(config-if)#ip address dhcp
+```
+
+### NAT
+Configurazione interfaccia *privata*:
+```
+R1(config)#int fa0/0
+R1(config-if)#ip address 10.10.10.1 255.255.255.0
+R1(config-if)#ip nat inside
+```
+
+Configurazione interfaccia *pubblica*:
+```
+R1(config)#int fa0/1
+R1(config-if)#ip address dhcp
+R1(config-if)#ip nat outside
+```
+Fare attenzione all'indirizzo settato dal dhcp, chiamiamolo `x`.
+
+Crea pool indirizzi `ovrld`:
+```
+R1(config)#ip nat pool ovrld x x prefix 24
+```
+
+Permetti indirizzi nattabili:
+```
+R1(config)#ip nat inside source list 7 pool ovrld overload
+```
+
+Crea access list indirizzi nattabili:
+```
+R1(config)#access-list 7 permit 10.10.10.0 0.0.0.255
 ```
 
 #### Velocità e duplex interfaccia
@@ -79,6 +138,41 @@ Utile per interfaccia one-arm di un router.
 ```
 R1(config-if)#no int fa0/0.2
 ```
+
+### DHCP
+```
+R1(config)#ip dhcp excluded-address 192.168.0.1 192.168.0.100
+R1(config)#ip dhcp pool vlan1pool
+R1(dhcp-config)#network 192.168.0.0 255.255.255.0
+R1(dhcp-config)#default-router 192.168.0.1
+R1(dhcp-config)#dns-server 8.8.8.8
+```
+#### Mostrare ip assegnati da DHCP
+```
+R1#show ip dhcp binding
+```
+
+### HSRP
+```
+R1(config-if)#standby 1 ip 192.168.1.1
+R1(config-if)#standby 1 priority 200
+R1(config-if)#standby 1 preempt
+R1(config-if)#standby 1 track fa0/1 150
+```
+* La priority di default è 100
+* Il router active è quello con la priority più alta
+* La seconda e la terza riga vanno eseguite solo su quello
+che vogliamo sia il *root*
+* La terza riga vuol dire che:
+    1. R1 active, R2 backup
+    1. R1 muore, R2 diventa active
+    1. R1 resuscita
+    1. R1 ritorna active (R2 non rimane active)
+* La quarta riga implementa il tracking:
+    1. Fa0/1 è l'interfaccia verso internet
+    1. Se cade diminuisce la priorità del router di 150
+        * La priorità diventa 50 se era 200
+    1. Viene utilizzato il router di backup come active
 
 ## Configurazione switch
 ### Spanning tree
