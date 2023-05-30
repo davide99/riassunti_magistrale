@@ -47,7 +47,8 @@ iperf3 -c <IP server>
 1. *Interface configuration*: `R1(config-if)#`
     * Ci si entra con: `int fa0/1`
 
-## Ping su router
+## Router
+### Ping
 ```
 R1#ping <ip>
 ```
@@ -88,14 +89,11 @@ R1(config-if)#ip address dhcp
 ### NAT
 Configurazione interfaccia *privata*:
 ```
-R1(config)#int fa0/0
-R1(config-if)#ip address 10.10.10.1 255.255.255.0
 R1(config-if)#ip nat inside
 ```
 
 Configurazione interfaccia *pubblica*:
 ```
-R1(config)#int fa0/1
 R1(config-if)#ip address dhcp
 R1(config-if)#ip nat outside
 ```
@@ -116,14 +114,14 @@ Crea access list indirizzi nattabili:
 R1(config)#access-list 7 permit 10.10.10.0 0.0.0.255
 ```
 
-#### Velocità e duplex interfaccia
+### Velocità e duplex interfaccia
 ```
 R1(config-if)#speed 100
 R1(config-if)#duplex full
 ```
 Utile per interfaccia one-arm di un router.
 
-#### Configurazione sottointerfaccia
+### Configurazione sottointerfaccia
 Creo sottointerfaccia per VLAN 2:
 ```
 R1(config)#int fa0/0
@@ -134,12 +132,13 @@ R1(config-subif)#no shut
 ```
 Utile per interfaccia one-arm di un router.
 
-#### Rimozione sottointerfaccia
+### Rimozione sottointerfaccia
 ```
 R1(config-if)#no int fa0/0.2
 ```
 
-### DHCP
+### Server DHCP
+#### Configurazione
 ```
 R1(config)#ip dhcp excluded-address 192.168.0.1 192.168.0.100
 R1(config)#ip dhcp pool vlan1pool
@@ -147,7 +146,8 @@ R1(dhcp-config)#network 192.168.0.0 255.255.255.0
 R1(dhcp-config)#default-router 192.168.0.1
 R1(dhcp-config)#dns-server 8.8.8.8
 ```
-#### Mostrare ip assegnati da DHCP
+
+#### Mostrare indirizzi assegnati
 ```
 R1#show ip dhcp binding
 ```
@@ -174,13 +174,11 @@ che vogliamo sia il *root*
         * La priorità diventa 50 se era 200
     1. Viene utilizzato il router di backup come active
 
-## Configurazione switch
+## Switch
 ### Spanning tree
-Lo spanning tree protocol è abilitato di default
-
 #### Visualizzazione stato spanning tree
 ```
-SW1#show spanning-tree vlan 1
+SW1#show spanning-tree vlan 1 (brief)
 ```
 
 #### Disabilitazione spanning tree
@@ -241,7 +239,7 @@ SW1(config-if)#switchport mode trunk
 SW1#show mac-address-table
 ```
 
-### Cambio aging entry filter databse
+#### Cambio aging entry filter databse
 ```
 SW1(config)#mac-address-table aging-time 30
 ```
